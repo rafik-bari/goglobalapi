@@ -4,7 +4,7 @@ namespace ustmaestro\goglobalapi\lib;
 
 /* GoGlobal Response parser */
 
-namespace GoGlobalApi\lib;
+namespace ustmaestro\goglobalapi\lib;
 
 
 class GGResponseParser{
@@ -20,6 +20,7 @@ class GGResponseParser{
                     $id = (string) $hotel->HotelCode;
                     $u = explode('/', (string) $hotel->HotelSearchCode);
                     $u = $u[0];
+
                     if(!array_key_exists($id, $response)){
                         $hotelData = [
                             'HotelUnique'       => $u,

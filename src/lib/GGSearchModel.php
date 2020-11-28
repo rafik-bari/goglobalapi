@@ -20,7 +20,7 @@ class GGSearchModel{
     public $stars = [];
     public $room_basises = [];
     public $apartments_only = false;
-
+    public $location;
     public function __construct() {
     }
 
@@ -29,11 +29,13 @@ class GGSearchModel{
 
         $xml = "";
         $xml .= GGHelper::WrapTag('SortOrder', $this->sort_order);
+        $xml .= GGHelper::WrapTag('Version',"2.3");
         $xml .= GGHelper::WrapTag('FilterPriceMin', $this->min_price);
         $xml .= GGHelper::WrapTag('FilterPriceMax', $this->max_price);
         $xml .= GGHelper::WrapTag('MaximumWaitTime', $this->max_wait_time);
         $xml .= GGHelper::WrapTag('MaxResponses', $this->max_responses);
-
+        $xml .= GGHelper::WrapTag('HotelFacilities',"True");
+        $xml .= GGHelper::WrapTag('RoomFacilities',1);
         if(count($this->room_basises)){
             $rb_xml = "";
             foreach($this->room_basises as $room_basis)
@@ -44,14 +46,18 @@ class GGSearchModel{
         if($this->hotel_name && !empty($this->hotel_name))
             $xml .= GGHelper::WrapTag('HotelName', $this->hotel_name);
 
-        $xml .= GGHelper::WrapTag('CityCode', $this->city_code);
+
         $xml .= GGHelper::WrapTag('ArrivalDate', date('Y-m-d',strtotime($this->check_in)));
         $xml .= GGHelper::WrapTag('Nights', $this->nights);
 
         if(count($this->stars))
             $xml .= GGHelper::WrapTag('Stars', implode(',', $this->stars));
         if($this->apartments_only)
-            $xml .= GGHelper::WrapTag('Apartments','true');
+            $xml .= GGHelper::WrapTag('Apartments','false');
+        if(isset($this->location))
+            $xml .= GGHelper::WrapTag('Location', $this->location);
+        if(isset($this->city_code))
+            $xml .= GGHelper::WrapTag('CityCode', $this->city_code);
 
         $rooms_xml = "";
         for($i=1; $i<=$this->rooms_number; $i++){
@@ -60,7 +66,7 @@ class GGSearchModel{
                 for($k=1; $k<=$this->rooms_persons[$i]['child']; $k++)
                     $child_xml .= GGHelper::WrapTag('Room', 5+$k);
             }
-            $rooms_xml .= GGHelper::WrapTag('Room', $child_xml,['Adults'=> $this->rooms_persons[$i]['adult'], 'RoomCount'=>1]);
+            $rooms_xml .= GGHelper::WrapTag('Room', $child_xml,['Adults'=> $this->rooms_persons[$i]['adult'], 'RoomCount'=>1,'ChildCount'=>0]);
         }
         $xml .= GGHelper::WrapTag('Rooms',$rooms_xml);
 

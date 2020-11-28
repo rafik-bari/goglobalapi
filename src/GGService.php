@@ -13,7 +13,7 @@ use ustmaestro\goglobalapi\lib\GGSearchModel;
  */
 class GGService {
 
-    const GGServiceUrl = "http://xml.qa.goglobal.travel/XMLWebService.asmx";
+    const GGServiceUrl = "https://directbooking.xml.goglobal.travel./xmlwebservice.asmx";
 
     protected $_agency;
     protected $_user;
@@ -90,13 +90,15 @@ class GGService {
      * Sending GoGlobal request
      */
     protected function _sendRequest($requestType, $xmlRequest = "") {
-        $xml = GGHelper::WrapTag('Root', $this->_makeXmlHeader($requestType) . GGHelper::WrapTag('Main', $xmlRequest));
+        $xml = GGHelper::WrapTag('Root', $this->_makeXmlHeader($requestType) . GGHelper::WrapTag('Main', $xmlRequest,["Version"=>"2.3","HotelFacilities"=>"True","RoomFacilities"=>"True","ResponseFormat"=>"JSON"]));
         $resp = $this->_wsdl->MakeRequest([
             'requestType' => $requestType,
             'xmlRequest' => $xml,
         ]);
         $this->_lastXml = $xml;
+
         $requestResult = $resp->MakeRequestResult;
+
         return $requestResult;
     }
 
@@ -106,7 +108,8 @@ class GGService {
     public function searchHotels(GGSearchModel $model) {
         $requestType = 1;
         $xml = $model->toXml();
-        return GGResponseParser::parseHotelsList($this->_sendRequest($requestType, $xml));
+        return $this->_sendRequest($requestType, $xml);
+        //return GGResponseParser::parseHotelsList($this->_sendRequest($requestType, $xml));
     }
 
     /**
